@@ -3,4 +3,6 @@
     <string name="door_is_locked">Door is Locked</string>
     <string name="door_is_unlocked">Door is Unlocked</string>
     <string name="door_lock_button">Locked the Door</string>
+    <string name="tts_door_unlocked">Door is not locked. Go and lock it!</string>
+    <string name="tts_door_locked">Door is locked</string>
 </resources>
