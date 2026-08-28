@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<AppFunctionAppMetadata xmlns:appfn="http://schemas.android.com/apk/androidx.appfunctions"
-    appfn:description="This app keeps a personal record of whether you've checked the front door.
-    Operational Patterns:
-    - Use 'isFrontDoorChecked' to see whether the front door has been marked as checked.
-    - Use 'setFrontDoorChecked' to record that you checked the front door, or to reset that record.
-    Constraints:
-    - This is a personal reminder log only; it doesn't control, lock, unlock, or actuate any physical door hardware."
-    appfn:displayDescription="@string/app_metadata_display_description" />

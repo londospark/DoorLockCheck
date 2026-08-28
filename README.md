@@ -1,70 +1,32 @@
 # Door Lock Check (Wear OS)
 
-A Wear OS application to track and record whether the front door has been checked. This app provides a simple UI for manual tracking and exposes AppFunctions for integration with AI agents.
+A Wear OS application to track and record whether the front door has been checked. This app provides a simple UI for manual tracking and is designed to catch you if you forget.
 
-## Features
+## Current Status (Done)
 
 - **Wear OS UI**: Simple toggle to mark the door as checked/unchecked.
-- **Persistence**: Uses Jetpack DataStore to remember the status.
-- **AppFunctions**: Exposes `isFrontDoorChecked` and `setFrontDoorChecked` to the Android system, allowing AI agents (like Gemini) to discover and interact with the app.
+- **Persistence**: Uses Jetpack DataStore to remember the status across reboots.
+- **Package Migration**: Successfully migrated from `com.example` to `dev.hubball.doorlockcheck`.
+- **Infrastructure**: Cleaned up experimental "AppFunctions" and voice logic to focus on the core flow.
 
-## Tech Stack
+## Roadmap (To-Do)
 
-- **Kotlin** & **Jetpack Compose for Wear OS**
-- **Jetpack DataStore** (Preferences)
-- **AndroidX AppFunctions** (version `1.0.0-alpha10`)
-- **KSP** (Kotlin Symbol Processing) for AppFunction metadata generation.
+- **Phase A: Watch Face Complication**: Implement a tap-to-toggle complication for glanceable status and one-tap updates without opening the app.
+- **Phase B: Geofencing**: Add home-exit detection to trigger reminders when leaving the house.
+- **Phase C: Proactive Notifications**: Fire a high-priority vibration reminder if the door hasn't been marked as checked when a geofence exit is detected.
 
-## Key Files
+## Architectural Notes (For the next Clanker)
 
-- `app/src/main/java/dev/hubball/doorlockcheck/presentation/DoorStatusAppFunctionService.kt`: Implementation of the AppFunctions.
-- `app/src/main/java/dev/hubball/doorlockcheck/presentation/DoorStatusPreferences.kt`: DataStore configuration and keys.
-- `app/src/main/res/xml/app_metadata.xml`: High-level description of the app for AI agents.
-- `app/src/main/AndroidManifest.xml`: Service registration and metadata linking.
+- **Status Management**: The app uses `dev.hubball.doorlockcheck.presentation.DoorStatusPreferences` for DataStore keys. The `MainActivity` and `DoorLockViewModel` handle the state.
+- **Voice Control**: We investigated Gemini AppFunctions and on-device SpeechRecognizer but abandoned them. Voice is either restricted by the OS or inefficient compared to a one-tap complication. See `voice_and_complication_plan.md` for the post-mortem.
+- **Complication Plan**: The plan is to have a one-tap toggle complication. This will require a `ComplicationDataSourceService` that writes to the shared DataStore.
 
-## Setup for Development
+## History of Clanker Assistance
 
-### Prerequisites
+This project has been heavily assisted by "Clankers" (AI agents).
+- **Milestone 1**: Implement core UI and DataStore persistence.
+- **Milestone 2**: Refactor and migrate package namespace.
+- **Milestone 3**: Research and prototype AppFunctions (eventually ripped out in favor of the Complication + Geofence approach).
+- **Milestone 4**: Clean up technical debt and establish the current roadmap.
 
-- Android Studio (latest Canary recommended for Android 16/AppFunctions support).
-- A Wear OS emulator or device.
-
-### Project Configuration
-
-- **Namespace**: `dev.hubball.doorlockcheck`
-- **Minimum SDK**: 30
-- **Target SDK**: 36 (Android 16 preview)
-- **Compile SDK**: 37 (Android 16 with Minor API Level 1)
-
-### KSP Configuration
-
-The project uses KSP to generate AppFunction schemas. Ensure that the following is in your `app/build.gradle.kts` if metadata generation issues occur:
-
-```kotlin
-ksp {
-    arg("appfunctions:aggregateAppFunctions", "true")
-}
-```
-
-## AI Agent Integration
-
-The app is configured to be discoverable by AI agents. You can verify the functions using ADB:
-
-```bash
-adb shell cmd app_function list-app-functions --package dev.hubball.doorlockcheck
-```
-
-To execute a function via ADB:
-
-```bash
-adb shell cmd app_function execute-app-function \
-  --package dev.hubball.doorlockcheck \
-  --function 'dev.hubball.doorlockcheck.presentation.DoorStatusAppFunctionService#isFrontDoorChecked'
-```
-
-## Notes for the next "Clanker" (AI Assistant)
-
-- The project recently migrated to package `dev.hubball.doorlockcheck`.
-- It uses the `@AppFunctionServiceEntryPoint` architecture introduced in `1.0.0-alpha10`.
-- The `BaseDoorStatusAppFunctionService` is abstract; KSP generates the concrete `DoorStatusAppFunctionService` (which is registered in the Manifest).
-- Ensure `compileSdk` remains at 37 with Minor API Level 1 for full AppFunctions support.
+Refer to `voice_and_complication_plan.md` for the detailed logic behind the current direction.
