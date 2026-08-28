@@ -1,6 +1,6 @@
 [versions]
 agp = "9.3.1"
-kotlin = "2.2.10"
+kotlin = "2.4.10"
 playServicesWearable = "18.0.0"
 composeBom = "2024.09.00"
 composeMaterial3 = "1.5.6"
@@ -9,12 +9,15 @@ composeUiTooling = "1.5.6"
 wearToolingPreview = "1.0.0"
 activityCompose = "1.8.0"
 coreSplashscreen = "1.2.0"
+ksp = "2.3.11"
 
 # Added dependencies for DataStore, Location/Geofencing, and Complications
 datastore = "1.2.1"
 playServicesLocation = "21.4.0"
 wearWatchface = "1.2.1"
 wearProtoLayout = "1.4.2"
+
+appfunctions = "1.0.0-alpha10"
 
 [libraries]
 play-services-wearable = { group = "com.google.android.gms", name = "play-services-wearable", version.ref = "playServicesWearable" }
@@ -38,6 +41,10 @@ play-services-location = { group = "com.google.android.gms", name = "play-servic
 androidx-wear-watchface-complications = { group = "androidx.wear.watchface", name = "watchface-complications-data-source-ktx", version.ref = "wearWatchface" }
 androidx-wear-protolayout = { group = "androidx.wear.protolayout", name = "protolayout", version.ref = "wearProtoLayout" }
 
+androidx-appfunctions = { group = "androidx.appfunctions", name = "appfunctions", version.ref = "appfunctions" }
+androidx-appfunctions-compiler = { group = "androidx.appfunctions", name = "appfunctions-compiler", version.ref = "appfunctions" }
+
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }

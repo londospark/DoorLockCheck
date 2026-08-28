@@ -1,4 +1,4 @@
-package com.example.doorlockcheck.presentation.theme
+package dev.hubball.doorlockcheck.presentation.theme
 
 import androidx.compose.runtime.Composable
 import androidx.wear.compose.material3.MaterialTheme
