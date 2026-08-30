@@ -1,9 +1,11 @@
 package dev.hubball.doorlockcheck.presentation
 
 import android.app.Application
+import android.content.ComponentName
 import androidx.datastore.preferences.core.edit
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.wear.watchface.complications.datasource.ComplicationDataSourceUpdateRequester
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
@@ -28,6 +30,18 @@ class DoorLockViewModel(application: Application) : AndroidViewModel(application
             dataStore.edit { preferences ->
                 preferences[isFrontDoorCheckedKey] = isLocked
             }
+
+            val componentName = ComponentName(
+                getApplication(),
+                DoorLockCheckComplicationDataSourceService::class.java
+            )
+
+            val requester = ComplicationDataSourceUpdateRequester.create(
+                getApplication(),
+                componentName
+            )
+
+            requester.requestUpdateAll()
         }
     }
 }

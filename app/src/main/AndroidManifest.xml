@@ -39,6 +39,23 @@
             </intent-filter>
         </activity>
 
+        <service
+            android:name=".presentation.DoorLockCheckComplicationDataSourceService"
+            android:exported="true"
+            android:permission="android.permission.BIND_COMPLICATION_PROVIDER">
+            <intent-filter>
+                <action android:name="android.support.wearable.complications.ACTION_COMPLICATION_UPDATE_REQUEST" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.support.wearable.complications.SUPPORTED_TYPES"
+                android:value="SHORT_TEXT" />
+
+            <meta-data
+                android:name="android.support.wearable.complications.UPDATE_PERIOD_SECONDS"
+                android:value="300" />
+        </service>
+
     </application>
 
 </manifest>

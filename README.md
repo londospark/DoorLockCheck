@@ -8,10 +8,11 @@ A Wear OS application to track and record whether the front door has been checke
 - **Persistence**: Uses Jetpack DataStore to remember the status across reboots.
 - **Package Migration**: Successfully migrated from `com.example` to `dev.hubball.doorlockcheck`.
 - **Infrastructure**: Cleaned up experimental "AppFunctions" and voice logic to focus on the core flow.
+- **Watch Face Complication (Viewable & Synchronized)**: Added a complication that displays "Locked"/"Unlocked" status on the watch face, with instant push-update synchronization whenever the status changes in the app.
 
 ## Roadmap (To-Do)
 
-- **Phase A: Watch Face Complication**: Implement a tap-to-toggle complication for glanceable status and one-tap updates without opening the app.
+- **Phase A (Part 2): Complication Interaction**: Implement a background tap-to-toggle action (via a background receiver) so that tapping the complication toggles the state directly without launching the full app.
 - **Phase B: Geofencing**: Add home-exit detection to trigger reminders when leaving the house.
 - **Phase C: Proactive Notifications**: Fire a high-priority vibration reminder if the door hasn't been marked as checked when a geofence exit is detected.
 
@@ -28,5 +29,6 @@ This project has been heavily assisted by "Clankers" (AI agents).
 - **Milestone 2**: Refactor and migrate package namespace.
 - **Milestone 3**: Research and prototype AppFunctions (eventually ripped out in favor of the Complication + Geofence approach).
 - **Milestone 4**: Clean up technical debt and establish the current roadmap.
+- **Milestone 5**: Implement viewable watch face complication and configure automatic push-update synchronization from the main app.
 
 Refer to `voice_and_complication_plan.md` for the detailed logic behind the current direction.
