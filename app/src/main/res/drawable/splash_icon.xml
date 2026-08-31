@@ -1,27 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:width="48dp"
         android:height="48dp"
         android:gravity="center">
         <shape android:shape="oval">
-            <solid android:color="#FFFFFF" />
+            <solid android:color="#2222FF" />
         </shape>
     </item>
     <item
-        android:width="40dp"
-        android:height="40dp"
+        android:width="24dp"
+        android:height="24dp"
         android:gravity="center">
         <vector
             android:width="24dp"
             android:height="24dp"
-            android:tint="#000000"
             android:viewportWidth="24"
             android:viewportHeight="24">
             <path
-                android:fillColor="#FF000000"
-                android:pathData="M17.6,11.48 L19.44,8.3a0.63,0.63 0,0 0,-1.09 -0.63l-1.88,3.24a11.43,11.43 0,0 0,-8.94 0L5.65,7.67a0.63,0.63 0,0 0,-1.09 0.63L6.4,11.48A10.81,10.81 0,0 0,1 20L23,20A10.81,10.81 0,0 0,17.6 11.48ZM7,17.25A1.25,1.25 0,1 1,8.25 16,1.25 1.25,0 0,1 7,17.25ZM17,17.25A1.25,1.25 0,1 1,18.25 16,1.25 1.25,0 0,1 17,17.25Z" />
+                android:fillColor="#FFFFFF"
+                android:pathData="M3 22h18M4 22V6c0-3.31.79-4 4.571-4h6.858C19.21 2 20 2.69 20 6v16" />
+            <path
+                android:fillColor="#FFFFFF"
+                android:pathData="M13.92 11.76V9.853c0-1.022-.86-1.85-1.92-1.85s-1.92.828-1.92 1.85v1.905M15 14.084c0 1.611-1.354 2.92-3 2.92s-3-1.309-3-2.92c0-1.71 1.354-3.01 3-3.01s3 1.3 3 3.01Z" />
         </vector>
     </item>
 </layer-list>

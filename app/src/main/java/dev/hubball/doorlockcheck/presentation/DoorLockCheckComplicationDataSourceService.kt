@@ -1,34 +1,87 @@
 package dev.hubball.doorlockcheck.presentation
 
+import android.graphics.drawable.Icon
+import android.util.Log
 import androidx.wear.watchface.complications.data.ComplicationData
 import androidx.wear.watchface.complications.data.ComplicationType
+import androidx.wear.watchface.complications.data.MonochromaticImage
 import androidx.wear.watchface.complications.data.PlainComplicationText
 import androidx.wear.watchface.complications.data.ShortTextComplicationData
+import androidx.wear.watchface.complications.datasource.ComplicationDataSourceService
 import androidx.wear.watchface.complications.datasource.ComplicationRequest
-import androidx.wear.watchface.complications.datasource.SuspendingComplicationDataSourceService
+import dev.hubball.doorlockcheck.R
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
-class DoorLockCheckComplicationDataSourceService : SuspendingComplicationDataSourceService() {
+class DoorLockCheckComplicationDataSourceService : ComplicationDataSourceService() {
 
+    private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private val dataStore by lazy { applicationContext.dataStore }
-    override suspend fun onComplicationRequest(request: ComplicationRequest): ComplicationData? {
-        val savedState = dataStore.data.first()
-        val isLocked = savedState[isFrontDoorCheckedKey] ?: false
 
-        return if (isLocked) {
-            shortTextComplicationData("Locked")
-        } else {
-            shortTextComplicationData("Unlocked")
+    override fun onDestroy() {
+        super.onDestroy()
+        serviceScope.cancel()
+    }
+
+    override fun onComplicationRequest(
+        request: ComplicationRequest,
+        listener: ComplicationRequestListener
+    ) {
+        Log.e("DoorLockCheck", "onComplicationRequest: ${request.complicationType}")
+        serviceScope.launch {
+            val savedState = dataStore.data.first()
+            val isLocked = savedState[isFrontDoorCheckedKey] ?: false
+
+            val data = when (request.complicationType) {
+                ComplicationType.SHORT_TEXT -> shortTextComplicationData(isLocked)
+                else -> null
+            }
+            listener.onComplicationData(data)
         }
     }
 
     override fun getPreviewData(type: ComplicationType): ComplicationData? {
-        return shortTextComplicationData("Preview")
+        Log.e("DoorLockCheck", "getPreviewData: requested type: $type")
+        
+        return when (type) {
+            ComplicationType.SHORT_TEXT -> {
+                ShortTextComplicationData.Builder(
+                    text = PlainComplicationText.Builder("LOCKED").build(),
+                    contentDescription = PlainComplicationText.Builder("Door Status").build()
+                )
+                // Attach a dummy icon to satisfy strict watch face formatting
+                .setMonochromaticImage(
+                    MonochromaticImage.Builder(
+                        // Make sure you have a valid drawable here
+                        Icon.createWithResource(this, R.drawable.ic_complication_lock) 
+                    ).build()
+                )
+                .build()
+            }
+            else -> {
+                Log.d("DoorLockCheck", "Unsupported type requested!")
+                null
+            }
+        }
     }
 
-    private fun shortTextComplicationData(text: String) =
-        ShortTextComplicationData.Builder(
-            text = PlainComplicationText.Builder(text).build(),
-            contentDescription = PlainComplicationText.Builder(text).build()
-        ).build()
+    private fun shortTextComplicationData(isLocked: Boolean): ShortTextComplicationData {
+        val status = if (isLocked) "LOCKED" else "OPEN"
+        val iconRes = if (isLocked) R.drawable.ic_complication_lock else R.drawable.ic_complication_unlock
+        
+        return ShortTextComplicationData.Builder(
+            text = PlainComplicationText.Builder(status).build(),
+            contentDescription = PlainComplicationText.Builder("Door $status").build()
+        )
+        .setMonochromaticImage(
+            MonochromaticImage.Builder(
+                Icon.createWithResource(this, iconRes)
+            ).build()
+        )
+        .build()
+    }
 }
