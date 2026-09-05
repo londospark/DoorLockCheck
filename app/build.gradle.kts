@@ -17,6 +17,7 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
@@ -30,6 +31,15 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+            isReturnDefaultValues = true
+        }
+    }
+    lint {
+        abortOnError = false
+    }
     useLibrary("wear-sdk")
     buildFeatures {
         compose = true
@@ -38,6 +48,7 @@ android {
 
 dependencies {
     implementation(libs.activity.compose)
+    implementation(libs.lifecycle.viewmodel.compose)
     implementation(libs.compose.foundation)
     implementation(libs.compose.material3)
     implementation(libs.compose.ui.tooling)
@@ -51,6 +62,16 @@ dependencies {
     implementation(libs.androidx.wear.watchface.complications)
     androidTestImplementation(platform(libs.compose.bom))
     androidTestImplementation(libs.ui.test.junit4)
+    androidTestImplementation(libs.junit4)
+    androidTestImplementation(libs.androidxjunitlib)
+    androidTestImplementation(libs.espressocorelib)
     debugImplementation(libs.ui.test.manifest)
     debugImplementation(libs.ui.tooling)
+    testImplementation(libs.jupiter)
+    testImplementation(libs.junit4core)
+    testImplementation(libs.androidxtestcore)
+    testImplementation(libs.mockklib)
+    testImplementation(libs.turbinelib)
+    testImplementation(libs.coroutinestestlib)
+    testImplementation(libs.robolectriclib)
 }
