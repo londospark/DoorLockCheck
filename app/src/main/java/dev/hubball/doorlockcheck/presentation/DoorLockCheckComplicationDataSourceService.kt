@@ -31,7 +31,7 @@ class DoorLockCheckComplicationDataSourceService : ComplicationDataSourceService
         request: ComplicationRequest,
         listener: ComplicationRequestListener
     ) {
-        Log.e("DoorLockCheck", "onComplicationRequest: ${request.complicationType}")
+        Log.d("DoorLockCheck", "onComplicationRequest: ${request.complicationType}")
         serviceScope.launch {
             val savedState = dataStore.data.first()
             val isLocked = savedState[isFrontDoorCheckedKey] ?: false
@@ -45,7 +45,7 @@ class DoorLockCheckComplicationDataSourceService : ComplicationDataSourceService
     }
 
     override fun getPreviewData(type: ComplicationType): ComplicationData? {
-        Log.e("DoorLockCheck", "getPreviewData: requested type: $type")
+        Log.d("DoorLockCheck", "getPreviewData: requested type: $type")
         
         return when (type) {
             ComplicationType.SHORT_TEXT -> {
