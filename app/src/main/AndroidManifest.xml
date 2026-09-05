@@ -39,6 +39,14 @@
             </intent-filter>
         </activity>
 
+        <receiver
+            android:name=".presentation.ToggleReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="dev.hubball.doorlockcheck.TOGGLE_DOOR" />
+            </intent-filter>
+        </receiver>
+
         <service
             android:name="dev.hubball.doorlockcheck.presentation.DoorLockCheckComplicationDataSourceService"
             android:exported="true"

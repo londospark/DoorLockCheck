@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+
 import androidx.compose.ui.res.stringResource
 import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
 import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
@@ -68,14 +69,13 @@ fun WearApp(viewModel: DoorLockViewModel) {
                     }
                     item {
                         Button(
-                            onClick = { viewModel.setLockedStatus(true) },
-                            enabled = !isLocked,
+                            onClick = { viewModel.toggleLockedStatus() },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .transformedHeight(this, transformationSpec),
                             transformation = SurfaceTransformation(transformationSpec),
                         ) {
-                            Text(stringResource(R.string.door_lock_button))
+                            Text(text = if (isLocked) stringResource(R.string.door_is_unlocked) else stringResource(R.string.door_lock_button))
                         }
                     }
                 }

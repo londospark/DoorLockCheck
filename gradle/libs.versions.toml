@@ -37,6 +37,7 @@ core-splashscreen = { group = "androidx.core", name = "core-splashscreen", versi
 
 # Data persistence, background geofencing, and watch face surfaces
 androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore" }
+
 play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
 androidx-wear-watchface-complications = { group = "androidx.wear.watchface", name = "watchface-complications-data-source-ktx", version.ref = "wearWatchface" }
 androidx-wear-protolayout = { group = "androidx.wear.protolayout", name = "protolayout", version.ref = "wearProtoLayout" }

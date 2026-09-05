@@ -1,6 +1,6 @@
 package dev.hubball.doorlockcheck.presentation
 
-import android.graphics.drawable.Icon
+import android.content.Intent
 import android.util.Log
 import androidx.wear.watchface.complications.data.ComplicationData
 import androidx.wear.watchface.complications.data.ComplicationType
@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 class DoorLockCheckComplicationDataSourceService : ComplicationDataSourceService() {
 
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
-    private val dataStore by lazy { applicationContext.dataStore }
+    private val dataStore by lazy { applicationContext.getDoorDataStore() }
 
     override fun onDestroy() {
         super.onDestroy()
@@ -29,7 +29,7 @@ class DoorLockCheckComplicationDataSourceService : ComplicationDataSourceService
 
     override fun onComplicationRequest(
         request: ComplicationRequest,
-        listener: ComplicationRequestListener
+        listener: ComplicationDataSourceService.ComplicationRequestListener
     ) {
         Log.d("DoorLockCheck", "onComplicationRequest: ${request.complicationType}")
         serviceScope.launch {
@@ -53,11 +53,9 @@ class DoorLockCheckComplicationDataSourceService : ComplicationDataSourceService
                     text = PlainComplicationText.Builder("LOCKED").build(),
                     contentDescription = PlainComplicationText.Builder("Door Status").build()
                 )
-                // Attach a dummy icon to satisfy strict watch face formatting
                 .setMonochromaticImage(
                     MonochromaticImage.Builder(
-                        // Make sure you have a valid drawable here
-                        Icon.createWithResource(this, R.drawable.ic_complication_lock) 
+                        android.graphics.drawable.Icon.createWithResource(this, R.drawable.ic_complication_lock)
                     ).build()
                 )
                 .build()
@@ -79,7 +77,7 @@ class DoorLockCheckComplicationDataSourceService : ComplicationDataSourceService
         )
         .setMonochromaticImage(
             MonochromaticImage.Builder(
-                Icon.createWithResource(this, iconRes)
+                android.graphics.drawable.Icon.createWithResource(this, iconRes)
             ).build()
         )
         .build()

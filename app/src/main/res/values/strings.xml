@@ -10,4 +10,7 @@
     <string name="shortcut_confirm_label">Confirm door is locked</string>
 
     <string name="app_metadata_display_description">Keep a personal record of checking your front door</string>
+
+    <string name="complication_launch_label">Open app</string>
+    <string name="complication_toggle_label">Toggle door status</string>
 </resources>
