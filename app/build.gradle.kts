@@ -36,9 +36,6 @@ android {
             isReturnDefaultValues = true
         }
     }
-    lint {
-        abortOnError = false
-    }
     buildFeatures {
         compose = true
     }
