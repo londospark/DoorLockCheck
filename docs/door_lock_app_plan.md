@@ -1,3 +1,9 @@
+> **Status: historical design doc (Aug 2026).** Kept for context on *why* the app is shaped
+> the way it is. Parts have since been superseded — notably persistence: this guide says
+> "Use Jetpack DataStore", but the shipped app deliberately uses a single synchronous
+> SharedPreferences key instead (a DataStore-based design caused a restart state-divergence
+> bug; see `../AGENTS.md` post-mortem #1 and `../README.md`).
+
 # Building Your Door Lock Watch App: A Step-by-Step Guide
 
 This guide will walk you through creating a Wear OS application to track whether you've locked your door, integrated directly into your existing `app` module.

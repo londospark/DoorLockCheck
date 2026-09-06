@@ -1,3 +1,8 @@
+> **Status: planning doc, not yet implemented (Sept 2026).** Note: this plan references a
+> shared `dataStore` and a `ToggleReceiver` broadcast — both were removed when the app
+> moved to single-store SharedPreferences (`DoorStatusPreferences.kt`). Any implementation
+> here must build on `DoorLockRepository`, not those old classes.
+
 # Door Status Watch App: Why Voice Doesn't Work, and the Complication + Geofence Plan
 
 This supersedes the voice-related parts of `door_lock_app_plan.md`. It documents why we abandoned Gemini voice control for this app, and lays out the plan for a tap-to-toggle complication plus a geofence-triggered reminder — not yet implemented.

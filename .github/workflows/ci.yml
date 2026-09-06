@@ -17,14 +17,14 @@ jobs:
           java-version: 21
 
       - name: Set up Android SDK (includes preview platforms)
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
         with:
           packages: 'platforms;android-37.1 build-tools;36.0.0'
 
       - uses: gradle/actions/setup-gradle@v5
 
-      - name: Unit tests (Robolectric - runs headless, no emulator needed)
-        run: ./gradlew testDebugUnitTest --stacktrace
+      - name: Tests and lint (headless via Robolectric - no emulator needed)
+        run: ./gradlew check --stacktrace
 
       - name: Assemble debug APK
         run: ./gradlew assembleDebug --stacktrace
@@ -34,4 +34,6 @@ jobs:
         uses: actions/upload-artifact@v5
         with:
           name: test-reports
-          path: app/build/reports/tests/
+          path: |
+            app/build/reports/tests/
+            app/build/reports/lint-results-debug.html
