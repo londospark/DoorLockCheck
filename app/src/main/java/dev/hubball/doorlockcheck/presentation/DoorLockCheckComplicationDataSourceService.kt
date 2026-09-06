@@ -1,85 +1,46 @@
 package dev.hubball.doorlockcheck.presentation
 
-import android.content.Intent
 import android.util.Log
 import androidx.wear.watchface.complications.data.ComplicationData
 import androidx.wear.watchface.complications.data.ComplicationType
-import androidx.wear.watchface.complications.data.MonochromaticImage
-import androidx.wear.watchface.complications.data.PlainComplicationText
-import androidx.wear.watchface.complications.data.ShortTextComplicationData
 import androidx.wear.watchface.complications.datasource.ComplicationDataSourceService
 import androidx.wear.watchface.complications.datasource.ComplicationRequest
-import dev.hubball.doorlockcheck.R
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 
+/**
+ * Provides door status to watch faces.
+ *
+ * Reads state straight from SharedPreferences (fresh on every request) rather than
+ * caching it in a flow: watch faces pull this service on their own schedule, so a
+ * cached value here could go stale whenever the app process writes a new one.
+ */
 class DoorLockCheckComplicationDataSourceService : ComplicationDataSourceService() {
-
-    private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
-    private val dataStore by lazy { applicationContext.getDoorDataStore() }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        serviceScope.cancel()
-    }
 
     override fun onComplicationRequest(
         request: ComplicationRequest,
-        listener: ComplicationDataSourceService.ComplicationRequestListener
+        listener: ComplicationRequestListener
     ) {
-        Log.d("DoorLockCheck", "onComplicationRequest: ${request.complicationType}")
-        serviceScope.launch {
-            val savedState = dataStore.data.first()
-            val isLocked = savedState[isFrontDoorCheckedKey] ?: false
+        Log.d(TAG, "onComplicationRequest: ${request.complicationType}")
+        val isLocked = applicationContext.doorPreferences().isFrontDoorChecked()
 
-            val data = when (request.complicationType) {
-                ComplicationType.SHORT_TEXT -> shortTextComplicationData(isLocked)
-                else -> null
-            }
-            listener.onComplicationData(data)
+        val data: ComplicationData? = when (request.complicationType) {
+            ComplicationType.SHORT_TEXT -> ComplicationDataFactory.shortText(this, isLocked)
+            else -> null
         }
+        listener.onComplicationData(data)
     }
 
     override fun getPreviewData(type: ComplicationType): ComplicationData? {
-        Log.d("DoorLockCheck", "getPreviewData: requested type: $type")
-        
+        Log.d(TAG, "getPreviewData: requested type: $type")
         return when (type) {
-            ComplicationType.SHORT_TEXT -> {
-                ShortTextComplicationData.Builder(
-                    text = PlainComplicationText.Builder("LOCKED").build(),
-                    contentDescription = PlainComplicationText.Builder("Door Status").build()
-                )
-                .setMonochromaticImage(
-                    MonochromaticImage.Builder(
-                        android.graphics.drawable.Icon.createWithResource(this, R.drawable.ic_complication_lock)
-                    ).build()
-                )
-                .build()
-            }
+            ComplicationType.SHORT_TEXT -> ComplicationDataFactory.preview(this)
             else -> {
-                Log.d("DoorLockCheck", "Unsupported type requested!")
+                Log.d(TAG, "Unsupported type requested: $type")
                 null
             }
         }
     }
 
-    private fun shortTextComplicationData(isLocked: Boolean): ShortTextComplicationData {
-        val status = if (isLocked) "LOCKED" else "OPEN"
-        val iconRes = if (isLocked) R.drawable.ic_complication_lock else R.drawable.ic_complication_unlock
-        
-        return ShortTextComplicationData.Builder(
-            text = PlainComplicationText.Builder(status).build(),
-            contentDescription = PlainComplicationText.Builder("Door $status").build()
-        )
-        .setMonochromaticImage(
-            MonochromaticImage.Builder(
-                android.graphics.drawable.Icon.createWithResource(this, iconRes)
-            ).build()
-        )
-        .build()
+    companion object {
+        private const val TAG = "DoorLockCheck"
     }
 }

@@ -1,34 +1,62 @@
-# Door Lock Check (Wear OS)
+# Door Lock Check
 
-A Wear OS application to track and record whether the front door has been checked. This app provides a simple UI for manual tracking and is designed to catch you if you forget.
+A Wear OS standalone app to track whether you have locked and checked your front door. Provides a
+watch face complication to display the status at a glance.
 
-## Current Status (Done)
+## Features
 
-- **Wear OS UI**: Simple toggle to mark the door as checked/unchecked.
-- **Persistence**: Uses Jetpack DataStore to remember the status across reboots.
-- **Package Migration**: Successfully migrated from `com.example` to `dev.hubball.doorlockcheck`.
-- **Infrastructure**: Cleaned up experimental "AppFunctions" and voice logic to focus on the core flow.
-- **Watch Face Complication (Viewable & Synchronized)**: Added a complication that displays "Locked"/"Unlocked" status on the watch face, with instant push-update synchronization whenever the status changes in the app.
+- **Status Tracking**: A simple button in the app to toggle the door status between
+  checked (locked) and unchecked (unlocked).
+- **Complication Support**: A SHORT_TEXT complication to show the status on your watch face,
+  with a matching lock icon.
+- **Persistence**: State lives in a single SharedPreferences key
+  (`door_status_prefs` / `is_front_door_checked`), read synchronously so startup never
+  flashes the wrong status.
+- **Standalone**: The app runs directly on Wear OS without needing a paired phone app.
 
-## Roadmap (To-Do)
+## Planned
 
-- **Phase A (Part 2): Complication Interaction**: Implement a background tap-to-toggle action (via a background receiver) so that tapping the complication toggles the state directly without launching the full app.
-- **Phase B: Geofencing**: Add home-exit detection to trigger reminders when leaving the house.
-- **Phase C: Proactive Notifications**: Fire a high-priority vibration reminder if the door hasn't been marked as checked when a geofence exit is detected.
+- **Voice**: Interact with the app via voice command to report the lock status and record
+  that the door is locked.
+- **Location-awareness**: A reminder to lock your door if you leave home with it unlocked.
 
-## Architectural Notes (For the next Clanker)
+## Project Structure
 
-- **Status Management**: The app uses `dev.hubball.doorlockcheck.presentation.DoorStatusPreferences` for DataStore keys. The `MainActivity` and `DoorLockViewModel` handle the state.
-- **Voice Control**: We investigated Gemini AppFunctions and on-device SpeechRecognizer but abandoned them. Voice is either restricted by the OS or inefficient compared to a one-tap complication. See `voice_and_complication_plan.md` for the post-mortem.
-- **Complication Plan**: The plan is to have a one-tap toggle complication. This will require a `ComplicationDataSourceService` that writes to the shared DataStore.
+- **Status Management**: The app uses `dev.hubball.doorlockcheck.presentation.DoorStatusPreferences`
+  for the persistence constants. `data/DoorLockRepository` is the seam, implemented by
+  `DoorLockPreferencesRepository`; `MainActivity` and `DoorLockViewModel` handle the UI state.
+- **Complication**: `presentation/DoorLockCheckComplicationDataSourceService` reads state
+  fresh per request; UI data is built by `presentation/ComplicationDataFactory`.
+- **Milestones**:
+  1. **Milestone 1**: Implement core UI and persistence. (Done)
+  2. **Milestone 2**: Watch face complication integration. (Done)
+  3. **Milestone 3**: Voice interaction. (Planned)
+  4. **Milestone 4**: Location-aware reminders. (Planned)
 
-## History of Clanker Assistance
+## Building and Running
 
-This project has been heavily assisted by "Clankers" (AI agents).
-- **Milestone 1**: Implement core UI and DataStore persistence.
-- **Milestone 2**: Refactor and migrate package namespace.
-- **Milestone 3**: Research and prototype AppFunctions (eventually ripped out in favor of the Complication + Geofence approach).
-- **Milestone 4**: Clean up technical debt and establish the current roadmap.
-- **Milestone 5**: Implement viewable watch face complication and configure automatic push-update synchronization from the main app.
+This is a standard Gradle-based Wear OS application.
 
-Refer to `voice_and_complication_plan.md` for the detailed logic behind the current direction.
+### Gradle Tasks
+
+- `./gradlew assembleDebug` builds the debug APK.
+- `./gradlew testDebugUnitTest` runs all tests (headless via Robolectric).
+- `./gradlew check` runs tests and lint.
+
+### Installation
+
+Install the built debug APK directly on your Wear OS emulator or device with
+`adb install app/build/outputs/apk/debug/app-debug.apk`. Add the "Door Lock Check" complication
+to any watch face that supports editable complications.
+
+### Dependencies
+
+- AndroidX Wear Compose (Material 3) for the user interface.
+- Watch Face Complications Data Source for displaying the lock status on the watch face.
+
+## Testing
+
+All tests run headless (`./gradlew testDebugUnitTest`) — there is no `androidTest` layer on
+purpose. The suite follows the testing pyramid: unit tests (ViewModel), integration tests
+(Repository + persistence under Robolectric), and UI tests that drive the real
+`MainActivity` under Robolectric. See `AGENTS.md` for the rules and history behind this setup.

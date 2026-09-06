@@ -1,35 +1,25 @@
 package dev.hubball.doorlockcheck.presentation
 
 import android.content.Context
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.PreferenceDataStoreFactory
-import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.SharedPreferencesMigration
-import okio.Path.Companion.toPath
+import android.content.SharedPreferences
 
-private const val DOOR_STATUS_PREFERENCES_NAME = "door_status_prefs.preferences_pb"
-private const val SHARED_PREFS_NAME = "door_status_prefs"
+/**
+ * Single source of truth for door lock state: one SharedPreferences file, one key.
+ *
+ * History note: this app previously used Jetpack DataStore with a SharedPreferences seed,
+ * which created two sources of truth and a state-divergence bug on restart. See AGENTS.md.
+ * Do not reintroduce a second store without making one of them a strict write-through cache.
+ */
+const val DOOR_STATUS_PREFERENCES_NAME = "door_status_prefs"
 
-private val dataStoreMap = java.util.WeakHashMap<Context, DataStore<Preferences>>()
+const val IS_FRONT_DOOR_CHECKED_KEY = "is_front_door_checked"
 
-fun Context.getDoorDataStore(): DataStore<Preferences> {
-    return dataStoreMap[this] ?: PreferenceDataStoreFactory.createWithPath(
-        produceFile = { filesDir.resolve(DOOR_STATUS_PREFERENCES_NAME).absolutePath.toPath() },
-        migrations = listOf(SharedPreferencesMigration(this, SHARED_PREFS_NAME))
-    ).also { dataStoreMap[this] = it }
+fun Context.doorPreferences(): SharedPreferences =
+    getSharedPreferences(DOOR_STATUS_PREFERENCES_NAME, Context.MODE_PRIVATE)
+
+fun SharedPreferences.isFrontDoorChecked(): Boolean =
+    getBoolean(IS_FRONT_DOOR_CHECKED_KEY, false)
+
+fun SharedPreferences.setFrontDoorChecked(isLocked: Boolean) {
+    edit().putBoolean(IS_FRONT_DOOR_CHECKED_KEY, isLocked).apply()
 }
-
-fun resetDoorDataStoreCache(context: Context) {
-    dataStoreMap.remove(context)
-}
-
-fun clearAllDataStoreFiles(context: Context) {
-    val file = context.filesDir.resolve(DOOR_STATUS_PREFERENCES_NAME)
-    if (file.exists()) file.delete()
-    val prefs = context.getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE)
-    prefs.edit().clear().apply()
-    resetDoorDataStoreCache(context)
-}
-
-val isFrontDoorCheckedKey = booleanPreferencesKey("is_front_door_checked")

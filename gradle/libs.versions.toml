@@ -9,30 +9,26 @@ composeUiTooling = "1.6.2"
 wearToolingPreview = "1.0.0"
 activityCompose = "1.13.0"
 coreSplashscreen = "1.2.0"
-lifecycleViewmodelCompose = "2.9.1"
 ksp = "2.1.10-1.0.31"
-
-# Added dependencies for DataStore, Location/Geofencing, and Complications
-datastore = "1.2.1"
-playServicesLocation = "21.4.0"
 wearWatchface = "1.3.0"
-wearProtoLayout = "1.4.2"
 
-appfunctions = "1.0.0-alpha10"
-
-# Testing
-junit4core = "4.13.2"
-junit = "5.14.0"
-mockk = "1.14.5"
+# Testing (JUnit 4 only: AGP's default unit test runner is JUnit 4, and Robolectric
+# requires it. Mixing in JUnit 5 without useJUnitPlatform() + vintage engine causes
+# jupiter tests to be silently skipped - see AGENTS.md)
+junit4 = "4.13.2"
 turbine = "1.2.0"
 coroutinesTest = "1.10.2"
 robolectric = "4.15.1"
-androidxJunit = "1.2.1"
-espresso = "3.6.1"
 androidxTestCore = "1.6.1"
+espresso = "3.6.1"
 
+# Core compose artifacts are intentionally versionless: the androidx.compose BOM
+# (compose-bom) is applied in the app AND test classpath so both resolve the same
+# compose-ui version. A previous revision pinned core compose to 1.6.2, which was
+# both wrong (a Wear-Compose version number applied to core Compose) and dead
+# config (overridden transitively) - and version drift between app/test compose-ui
+# produced NoSuchFieldError crashes in Robolectric.
 [libraries]
-play-services-wearable = { group = "com.google.android.gms", name = "play-services-wearable", version.ref = "playServicesWearable" }
 compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
 ui = { group = "androidx.compose.ui", name = "ui" }
 ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
@@ -45,25 +41,15 @@ compose-foundation = { group = "androidx.wear.compose", name = "compose-foundati
 compose-ui-tooling = { group = "androidx.wear.compose", name = "compose-ui-tooling", version.ref = "composeUiTooling" }
 wear-tooling-preview = { group = "androidx.wear", name = "wear-tooling-preview", version.ref = "wearToolingPreview" }
 activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
-lifecycle-viewmodel-compose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "lifecycleViewmodelCompose" }
 core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "coreSplashscreen" }
-
-# Data persistence, background geofencing, and watch face surfaces
-androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore" }
-
-play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
+play-services-wearable = { group = "com.google.android.gms", name = "play-services-wearable", version.ref = "playServicesWearable" }
 androidx-wear-watchface-complications = { group = "androidx.wear.watchface", name = "watchface-complications-data-source-ktx", version.ref = "wearWatchface" }
-androidx-wear-protolayout = { group = "androidx.wear.protolayout", name = "protolayout", version.ref = "wearProtoLayout" }
 
 # Testing
-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "junit" }
-junit4core = { group = "junit", name = "junit", version.ref = "junit4core" }
-junit4 = { group = "junit", name = "junit", version.ref = "androidxJunit" }
-mockklib = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
+junit4core = { group = "junit", name = "junit", version.ref = "junit4" }
 turbinelib = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine" }
 coroutinestestlib = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutinesTest" }
 robolectriclib = { group = "org.robolectric", name = "robolectric", version.ref = "robolectric" }
-androidxjunitlib = { group = "androidx.test.ext", name = "junit", version.ref = "androidxJunit" }
 androidxtestcore = { group = "androidx.test", name = "core", version.ref = "androidxTestCore" }
 espressocorelib = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espresso" }
 

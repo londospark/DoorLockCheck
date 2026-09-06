@@ -17,7 +17,6 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
@@ -40,15 +39,16 @@ android {
     lint {
         abortOnError = false
     }
-    useLibrary("wear-sdk")
     buildFeatures {
         compose = true
     }
 }
 
 dependencies {
+    // BOM applied app-side too (not just androidTest): keeps main and test
+    // classpaths resolving identical compose versions - see AGENTS.md.
+    implementation(platform(libs.compose.bom))
     implementation(libs.activity.compose)
-    implementation(libs.lifecycle.viewmodel.compose)
     implementation(libs.compose.foundation)
     implementation(libs.compose.material3)
     implementation(libs.compose.ui.tooling)
@@ -58,20 +58,18 @@ dependencies {
     implementation(libs.ui.graphics)
     implementation(libs.ui.tooling.preview)
     implementation(libs.wear.tooling.preview)
-    implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.wear.watchface.complications)
-    androidTestImplementation(platform(libs.compose.bom))
-    androidTestImplementation(libs.ui.test.junit4)
-    androidTestImplementation(libs.junit4)
-    androidTestImplementation(libs.androidxjunitlib)
-    androidTestImplementation(libs.espressocorelib)
     debugImplementation(libs.ui.test.manifest)
     debugImplementation(libs.ui.tooling)
-    testImplementation(libs.jupiter)
+
+    // Headless tests (Robolectric). All layers except "runs on a real watch" are
+    // covered here - see AGENTS.md for why the androidTest layer was removed.
     testImplementation(libs.junit4core)
+    testImplementation(libs.robolectriclib)
     testImplementation(libs.androidxtestcore)
-    testImplementation(libs.mockklib)
     testImplementation(libs.turbinelib)
     testImplementation(libs.coroutinestestlib)
-    testImplementation(libs.robolectriclib)
+    testImplementation(platform(libs.compose.bom))
+    testImplementation(libs.ui.test.junit4)
+    testImplementation(libs.espressocorelib)
 }
