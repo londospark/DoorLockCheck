@@ -1,0 +1,115 @@
+name: Release
+
+# Builds a debug APK, a signed release APK, and a signed release AAB (the
+# format Play Store requires), attaches the APKs to a GitHub Release, and
+# optionally pushes the AAB straight to the Play Store internal testing
+# track. See README "Release & Play Store submission" for the one-time
+# secrets setup this workflow depends on.
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      versionName:
+        description: "Version name for this build (e.g. 1.2.0). Defaults to 0.0.<run number> for manual runs."
+        required: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      version-name: ${{ steps.version.outputs.name }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Set up Android SDK (includes preview platforms)
+        uses: android-actions/setup-android@v3
+        with:
+          packages: 'platforms;android-37.1 build-tools;36.0.0'
+
+      - uses: gradle/actions/setup-gradle@v5
+
+      - name: Resolve version name
+        id: version
+        run: |
+          if [[ "${{ github.event_name }}" == "push" ]]; then
+            name="${GITHUB_REF_NAME#v}"
+          else
+            name="${{ inputs.versionName }}"
+          fi
+          if [[ -z "$name" ]]; then
+            name="0.0.${{ github.run_number }}"
+          fi
+          echo "name=$name" >> "$GITHUB_OUTPUT"
+
+      - name: Unit tests (Robolectric - runs headless, no emulator needed)
+        run: ./gradlew testDebugUnitTest --stacktrace
+
+      - name: Decode release keystore
+        if: ${{ secrets.RELEASE_KEYSTORE_BASE64 != '' }}
+        run: |
+          echo "${{ secrets.RELEASE_KEYSTORE_BASE64 }}" | base64 -d > "$RUNNER_TEMP/release.keystore.jks"
+          echo "RELEASE_KEYSTORE_PATH=$RUNNER_TEMP/release.keystore.jks" >> "$GITHUB_ENV"
+
+      - name: Build debug APK, release APK, and release AAB
+        env:
+          RELEASE_KEYSTORE_PASSWORD: ${{ secrets.RELEASE_KEYSTORE_PASSWORD }}
+          RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
+          RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
+        run: |
+          ./gradlew assembleDebug assembleRelease bundleRelease \
+            -PreleaseVersionName="${{ steps.version.outputs.name }}" \
+            -PreleaseVersionCode="${{ github.run_number }}" \
+            --stacktrace
+
+      - name: Collect artifacts
+        run: |
+          mkdir -p artifacts
+          cp app/build/outputs/apk/debug/app-debug.apk artifacts/DoorLockCheck-debug.apk
+          cp app/build/outputs/apk/release/app-release.apk artifacts/DoorLockCheck-release.apk
+          cp app/build/outputs/bundle/release/app-release.aab artifacts/DoorLockCheck-release.aab
+          (cd artifacts && sha256sum *.apk *.aab > SHA256SUMS.txt)
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v5
+        with:
+          name: door-lock-check-${{ steps.version.outputs.name }}
+          path: artifacts/
+
+      - name: Create GitHub release
+        if: github.event_name == 'push'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/*
+          generate_release_notes: true
+
+  deploy-play-store:
+    needs: build
+    runs-on: ubuntu-latest
+    # Only runs once PLAY_STORE_SERVICE_ACCOUNT_JSON is configured (see README)
+    # and only for tagged releases, never for manual test builds.
+    if: ${{ github.event_name == 'push' && secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON != '' }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/download-artifact@v5
+        with:
+          name: door-lock-check-${{ needs.build.outputs.version-name }}
+          path: artifacts
+
+      - name: Upload to Play Store internal testing track
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
+          packageName: dev.hubball.doorlockcheck
+          releaseFiles: artifacts/DoorLockCheck-release.aab
+          track: internal
+          status: draft
+          whatsNewDirectory: fastlane/metadata/android/en-GB/changelogs

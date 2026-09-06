@@ -9,4 +9,9 @@
 /captures
 .externalNativeBuild
 .cxx
+
+# Release signing secrets - never commit these (see keystore.properties.example)
+keystore.properties
+*.jks
+*.keystore
 local.properties

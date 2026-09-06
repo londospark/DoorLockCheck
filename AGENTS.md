@@ -8,7 +8,7 @@ development. Read them before "helping".
 
 ```bash
 # System java is not on PATH; point Gradle at Android Studio's JBR:
-export JAVA_HOME=/home/londo/.local/share/JetBrains/Toolbox/apps/android-studio/jbr
+export JAVA_HOME=/home/londo/.local/share/JetBrains/Toolbox/apps/android-studio-2/jbr
 
 ./gradlew assembleDebug            # build the APK
 ./gradlew testDebugUnitTest        # all tests (headless, Robolectric)

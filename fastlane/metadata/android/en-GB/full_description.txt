@@ -1,0 +1,18 @@
+Door Lock Check is a simple, standalone Wear OS app that tracks whether you've
+locked and checked your front door - so you never have to wonder while you're
+out.
+
+FEATURES
+
+- Status tracking: a single button on your watch to mark the door as checked
+  (locked) or unchecked (unlocked).
+- Watch face complication: add the Door Lock Check complication to any
+  compatible watch face to see your door status at a glance, with a matching
+  lock icon.
+- Instant, reliable state: your watch face and the app always agree, and
+  startup never flashes the wrong status.
+- Standalone: runs entirely on your watch. No phone app required, no account,
+  no internet connection, no ads.
+
+Door Lock Check does not collect, store, or transmit any personal data. Your
+door status stays on your watch.

@@ -1,0 +1,2 @@
+Initial release: track your front door's lock status from your watch, with a
+matching watch face complication.

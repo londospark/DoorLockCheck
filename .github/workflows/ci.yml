@@ -29,6 +29,9 @@ jobs:
       - name: Assemble debug APK
         run: ./gradlew assembleDebug --stacktrace
 
+      - name: Assemble release APK (falls back to debug signing without release secrets)
+        run: ./gradlew assembleRelease --stacktrace
+
       - name: Upload test reports on failure
         if: failure()
         uses: actions/upload-artifact@v5
