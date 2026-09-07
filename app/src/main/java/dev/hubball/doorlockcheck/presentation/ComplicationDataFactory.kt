@@ -1,6 +1,8 @@
 package dev.hubball.doorlockcheck.presentation
 
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.graphics.drawable.Icon
 import androidx.wear.watchface.complications.data.MonochromaticImage
 import androidx.wear.watchface.complications.data.PlainComplicationText
@@ -28,6 +30,14 @@ object ComplicationDataFactory {
             R.drawable.ic_complication_unlock
         }
 
+        val tapActionIntent = Intent(context, MainActivity::class.java)
+        val tapAction = PendingIntent.getActivity(
+            context,
+            0,
+            tapActionIntent,
+            PendingIntent.FLAG_IMMUTABLE
+        )
+
         return ShortTextComplicationData.Builder(
             text = PlainComplicationText.Builder(status).build(),
             contentDescription = PlainComplicationText.Builder("Door $status").build()
@@ -37,6 +47,7 @@ object ComplicationDataFactory {
                     Icon.createWithResource(context, iconRes)
                 ).build()
             )
+            .setTapAction(tapAction)
             .build()
     }
 

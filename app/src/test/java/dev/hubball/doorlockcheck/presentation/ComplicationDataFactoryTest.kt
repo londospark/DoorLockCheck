@@ -79,4 +79,16 @@ class ComplicationDataFactoryTest {
         assertNotNull(locked.renderedText())
         assertEquals(false, locked.renderedText() == unlocked.renderedText())
     }
+
+    @Test
+    fun `locked state has tap action`() {
+        val data = ComplicationDataFactory.shortText(context, isLocked = true)
+        assertNotNull(data.tapAction)
+    }
+
+    @Test
+    fun `unlocked state has tap action`() {
+        val data = ComplicationDataFactory.shortText(context, isLocked = false)
+        assertNotNull(data.tapAction)
+    }
 }
