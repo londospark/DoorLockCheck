@@ -1,5 +1,6 @@
 package dev.hubball.doorlockcheck.presentation
 
+import android.content.ComponentName
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.wear.watchface.complications.data.ShortTextComplicationData
@@ -8,6 +9,7 @@ import org.junit.Assert.assertNotNull
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
 import java.time.Instant
 
@@ -84,11 +86,17 @@ class ComplicationDataFactoryTest {
     fun `locked state has tap action`() {
         val data = ComplicationDataFactory.shortText(context, isLocked = true)
         assertNotNull(data.tapAction)
+        val shadowPendingIntent = shadowOf(data.tapAction)
+        val savedIntent = shadowPendingIntent.savedIntent
+        assertEquals(ComponentName(context, MainActivity::class.java), savedIntent.component)
     }
 
     @Test
     fun `unlocked state has tap action`() {
         val data = ComplicationDataFactory.shortText(context, isLocked = false)
         assertNotNull(data.tapAction)
+        val shadowPendingIntent = shadowOf(data.tapAction)
+        val savedIntent = shadowPendingIntent.savedIntent
+        assertEquals(ComponentName(context, MainActivity::class.java), savedIntent.component)
     }
 }
