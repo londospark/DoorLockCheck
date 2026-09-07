@@ -46,6 +46,14 @@ jobs:
       - name: Assemble release APK (falls back to debug signing without release secrets)
         run: ./gradlew assembleRelease --stacktrace
 
+      - name: Upload APKs (installable on a watch via adb install)
+        uses: actions/upload-artifact@v7
+        with:
+          name: apks
+          path: |
+            app/build/outputs/apk/debug/app-debug.apk
+            app/build/outputs/apk/release/app-release.apk
+
       - name: Upload test reports on failure
         if: failure()
         uses: actions/upload-artifact@v7
