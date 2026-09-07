@@ -35,7 +35,9 @@ jobs:
         with:
           packages: 'platforms;android-37.1 build-tools;36.0.0'
 
-      - uses: gradle/actions/setup-gradle@v5
+      - uses: gradle/actions/setup-gradle@v6
+        with:
+          cache-provider: basic
 
       - name: Resolve version name
         id: version
