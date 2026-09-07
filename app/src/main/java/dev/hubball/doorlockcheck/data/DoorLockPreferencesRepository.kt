@@ -1,10 +1,7 @@
 package dev.hubball.doorlockcheck.data
 
-import android.content.ComponentName
 import android.content.Context
 import android.util.Log
-import androidx.wear.watchface.complications.datasource.ComplicationDataSourceUpdateRequester
-import dev.hubball.doorlockcheck.presentation.DoorLockCheckComplicationDataSourceService
 import dev.hubball.doorlockcheck.presentation.doorPreferences
 import dev.hubball.doorlockcheck.presentation.isFrontDoorChecked
 import dev.hubball.doorlockcheck.presentation.setFrontDoorChecked
@@ -18,7 +15,9 @@ import kotlinx.coroutines.flow.asStateFlow
  * same in-memory copy and can never diverge from disk.
  */
 class DoorLockPreferencesRepository(
-    context: Context
+    context: Context,
+    private val complicationRefresher: ComplicationRefresher =
+        SystemComplicationRefresher(context.applicationContext)
 ) : DoorLockRepository {
 
     private val appContext = context.applicationContext
@@ -38,13 +37,7 @@ class DoorLockPreferencesRepository(
 
     private fun requestComplicationUpdate() {
         try {
-            val componentName = ComponentName(
-                appContext,
-                DoorLockCheckComplicationDataSourceService::class.java
-            )
-            ComplicationDataSourceUpdateRequester
-                .create(appContext, componentName)
-                .requestUpdateAll()
+            complicationRefresher.refresh()
         } catch (e: Exception) {
             // Best effort: the complication refreshes on its own schedule regardless,
             // so a failed push here must not break the user's toggle.
