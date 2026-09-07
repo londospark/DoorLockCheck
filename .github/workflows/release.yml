@@ -23,9 +23,9 @@ jobs:
       version-name: ${{ steps.version.outputs.name }}
       has-play-store-secret: ${{ steps.play-store-secret.outputs.present }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-java@v5
+      - uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: 21
@@ -35,7 +35,9 @@ jobs:
         with:
           packages: 'platforms;android-37.1 build-tools;36.0.0'
 
-      - uses: gradle/actions/setup-gradle@v5
+      - uses: gradle/actions/setup-gradle@v6
+        with:
+          cache-provider: basic
 
       - name: Resolve version name
         id: version
@@ -93,14 +95,14 @@ jobs:
           (cd artifacts && sha256sum *.apk *.aab > SHA256SUMS.txt)
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: door-lock-check-${{ steps.version.outputs.name }}
           path: artifacts/
 
       - name: Create GitHub release
         if: github.event_name == 'push'
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: artifacts/*
           generate_release_notes: true
@@ -114,9 +116,9 @@ jobs:
     # has-play-store-secret as an output instead.)
     if: ${{ github.event_name == 'push' && needs.build.outputs.has-play-store-secret == 'true' }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v8
         with:
           name: door-lock-check-${{ needs.build.outputs.version-name }}
           path: artifacts
