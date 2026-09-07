@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import dev.hubball.doorlockcheck.presentation.IS_FRONT_DOOR_CHECKED_KEY
 import dev.hubball.doorlockcheck.presentation.doorPreferences
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -102,6 +103,74 @@ class DoorLockPreferencesRepositoryTest {
         // request; the repository must swallow the failure and still persist.
         val repository = DoorLockPreferencesRepository(context)
         repository.setLocked(true)
+        assertTrue(DoorLockPreferencesRepository(context).isLocked.value)
+    }
+
+    /**
+     * Regression tests for issue #7 (complication shows stale/wrong state).
+     * Confirmed on a real watch that the complication can go stale even across
+     * a full app restart with correct persisted state - that's a Wear OS host
+     * behaviour a headless test cannot reach. What these tests pin down is the
+     * one part of the bug that lives in this app: every write must actually ask
+     * the system to refresh the complication. Mutation-checked by temporarily
+     * deleting the `requestComplicationUpdate()` call in setLocked() and
+     * confirming `requests a complication refresh` below fails.
+     */
+    private class FakeComplicationRefresher(
+        private val onRefresh: () -> Unit = {}
+    ) : ComplicationRefresher {
+        var refreshCount = 0
+            private set
+
+        override fun refresh() {
+            refreshCount++
+            onRefresh()
+        }
+    }
+
+    @Test
+    fun `setLocked requests a complication refresh`() {
+        val refresher = FakeComplicationRefresher()
+        val repository = DoorLockPreferencesRepository(context, refresher)
+
+        repository.setLocked(true)
+
+        assertEquals(1, refresher.refreshCount)
+    }
+
+    @Test
+    fun `toggle requests a complication refresh`() {
+        val refresher = FakeComplicationRefresher()
+        val repository = DoorLockPreferencesRepository(context, refresher)
+
+        repository.toggle()
+
+        assertEquals(1, refresher.refreshCount)
+    }
+
+    @Test
+    fun `each call to setLocked requests its own complication refresh`() {
+        val refresher = FakeComplicationRefresher()
+        val repository = DoorLockPreferencesRepository(context, refresher)
+
+        repository.setLocked(true)
+        repository.setLocked(false)
+        repository.toggle()
+
+        assertEquals(3, refresher.refreshCount)
+    }
+
+    @Test
+    fun `a failing complication refresh is swallowed and state still persists`() {
+        val throwingRefresher = FakeComplicationRefresher(
+            onRefresh = { throw RuntimeException("no wearable host in this test") }
+        )
+        val repository = DoorLockPreferencesRepository(context, throwingRefresher)
+
+        repository.setLocked(true)
+
+        assertEquals(1, throwingRefresher.refreshCount)
+        assertTrue(repository.isLocked.value)
         assertTrue(DoorLockPreferencesRepository(context).isLocked.value)
     }
 }
