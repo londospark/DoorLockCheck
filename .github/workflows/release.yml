@@ -21,6 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       version-name: ${{ steps.version.outputs.name }}
+      has-play-store-secret: ${{ steps.play-store-secret.outputs.present }}
     steps:
       - uses: actions/checkout@v5
 
@@ -52,11 +53,25 @@ jobs:
       - name: Unit tests (Robolectric - runs headless, no emulator needed)
         run: ./gradlew testDebugUnitTest --stacktrace
 
-      - name: Decode release keystore
-        if: ${{ secrets.RELEASE_KEYSTORE_BASE64 != '' }}
+      - name: Decode release keystore (no-op if RELEASE_KEYSTORE_BASE64 isn't set)
+        env:
+          KEYSTORE_BASE64: ${{ secrets.RELEASE_KEYSTORE_BASE64 }}
         run: |
-          echo "${{ secrets.RELEASE_KEYSTORE_BASE64 }}" | base64 -d > "$RUNNER_TEMP/release.keystore.jks"
-          echo "RELEASE_KEYSTORE_PATH=$RUNNER_TEMP/release.keystore.jks" >> "$GITHUB_ENV"
+          if [[ -n "$KEYSTORE_BASE64" ]]; then
+            echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.keystore.jks"
+            echo "RELEASE_KEYSTORE_PATH=$RUNNER_TEMP/release.keystore.jks" >> "$GITHUB_ENV"
+          fi
+
+      - name: Check for Play Store service account secret
+        id: play-store-secret
+        env:
+          SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}
+        run: |
+          if [[ -n "$SERVICE_ACCOUNT_JSON" ]]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Build debug APK, release APK, and release AAB
         env:
@@ -94,8 +109,10 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     # Only runs once PLAY_STORE_SERVICE_ACCOUNT_JSON is configured (see README)
-    # and only for tagged releases, never for manual test builds.
-    if: ${{ github.event_name == 'push' && secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON != '' }}
+    # and only for tagged releases, never for manual test builds. (Job-level
+    # `if` can't reference `secrets` directly, hence the build job exposing
+    # has-play-store-secret as an output instead.)
+    if: ${{ github.event_name == 'push' && needs.build.outputs.has-play-store-secret == 'true' }}
     steps:
       - uses: actions/checkout@v5
 
