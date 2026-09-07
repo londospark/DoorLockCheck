@@ -75,6 +75,14 @@ There is deliberately no `androidTest` layer; see [AGENTS.md](AGENTS.md) for why
 post-mortems from earlier AI-assisted work on this repo. Read it before changing
 persistence, complications, or the test setup.
 
+## Licence
+
+Source-available, not open-source: [PolyForm Noncommercial License 1.0.0](LICENSE). Anyone can
+read, build, modify, and use this for noncommercial purposes (sideloading it yourself, hobby
+forks, personal study, etc.) for free. Commercial use - including distributing it via an app
+store for profit - is reserved to the copyright holder. See [CONTRIBUTING.md](CONTRIBUTING.md)
+before opening a pull request.
+
 ## Release & Play Store submission
 
 ### CI pipelines
