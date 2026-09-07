@@ -12,6 +12,12 @@ import androidx.wear.watchface.complications.datasource.ComplicationRequest
  * Reads state straight from SharedPreferences (fresh on every request) rather than
  * caching it in a flow: watch faces pull this service on their own schedule, so a
  * cached value here could go stale whenever the app process writes a new one.
+ *
+ * Note: ComplicationDataSourceService does not expose a long-press action hook. The
+ * androidx.wear.watchface.complications.data.ComplicationData API only supports tap
+ * actions via setTapAction(). Long-press on complication slots is a watch face-level
+ * concern (used for the complication picker); data sources cannot register separate
+ * long-press handlers.
  */
 class DoorLockCheckComplicationDataSourceService : ComplicationDataSourceService() {
 
