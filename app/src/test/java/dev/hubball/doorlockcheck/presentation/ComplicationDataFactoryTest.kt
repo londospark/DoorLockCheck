@@ -23,7 +23,7 @@ class ComplicationDataFactoryTest {
     private val context: Context = ApplicationProvider.getApplicationContext()
 
     private fun ShortTextComplicationData.renderedText(): String =
-        text!!.getTextAt(context.resources, Instant.now()).toString()
+        text.getTextAt(context.resources, Instant.now()).toString()
 
     private fun ShortTextComplicationData.renderedContentDescription(): String =
         contentDescription!!.getTextAt(context.resources, Instant.now()).toString()
