@@ -73,3 +73,18 @@ The **licensor** is the individual or entity offering these terms, and the **sof
 **Your licenses** are all the licenses granted to you for the software under these terms.
 
 **Use** means anything you do with the software requiring one of your licenses.
+
+---
+
+## Additional Restriction: No App Store or Marketplace Distribution
+
+Notwithstanding the Distribution License above, and regardless of whether your purpose is
+otherwise permitted under this license, you may not publish, submit, upload, or otherwise make
+the software, or any copy or modified version of it, available through any software distribution
+platform intended for public download or installation - including but not limited to Google
+Play, the Apple App Store, F-Droid, the Amazon Appstore, or any similar app store or marketplace
+- whether or not you charge for it. That right is reserved exclusively to the licensor.
+
+This restriction does not prevent you from sharing copies of the software directly (for example,
+sending someone a built APK file, or maintaining a personal fork on a code-hosting site) for a
+permitted noncommercial purpose under the terms above.
